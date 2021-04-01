@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lost Viking</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: black;
+        }
+        div.game-container{
+            display: block;
+            text-align: center;
+        }
+        p.info-paragraph{
+            color: aqua;
+
+        }
+        p.info-paragraph a{
+            color: aqua;
+        }
+    </style>
+    <script type="text/javascript" src="js/jquery.js"></script>
+
+    <script type="module" src="./js/classes/game.js"></script>
+
+    <script type="text/javascript">
+
+
+        let canvas
+        let gl
+        let moveInterval = 10
+        let renderInterval = 10
+        let game
+
+        $(document).ready(function (){
+            canvas = document.getElementById("game")
+            InitializeGL(canvas)
+            startGame()
+        })
+
+        function InitializeGL(){
+            prepareCanvas()
+            gl = canvas.getContext("2d")
+
+            if (!gl){
+                alert("Failed initializing 2D")
+            }
+        }
+
+        function prepareCanvas() {
+
+            canvas.clientHeight = 711
+            canvas.clientWidth = 400
+
+            canvas.width = 400
+            canvas.height = 711
+
+        }
+
+        function startGame() {
+            console.log('starting game')
+            import("./js/classes/game.js").then(({ Game }) => {
+                game = new Game(gl, canvas)
+                game.initialize()
+            })
+        }
+    </script>
+</head>
+<body>
+<div class="game-container">
+    <canvas id="game"></canvas>
+</div>
+
+<p style="color: aqua" class="info-paragraph">
+    Architectured, coded and built by <a href="https://nukdotcom.ru/">NukDokPlex</a> special for <a href="http://nmt.edu.ru/">NMC</a>!
+</p>
+<p style="color: aqua" class="info-paragraph">
+    Using HTML5, pure JavaScript (ECMAScript 6 features), jQuery (just initialization) and Canvas (pure CanvasContext2D).
+</p>
+</body>
+</html>

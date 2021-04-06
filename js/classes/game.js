@@ -38,8 +38,7 @@ class Game {
             "ArrowRight": {"x": 1, "y": 0},
             "ArrowUp": {"x": 0, "y": -1},
             "ArrowDown": {"x": 0, "y": 1},
-            "u": {"x": 0, "y": 0},
-            "Escape": {"x": 0, "y": 0}
+            "KeyU": {"x": 0, "y": 0},
         }
 
 
@@ -50,7 +49,7 @@ class Game {
 
 
         this.navigate(mainMenu)
-        let pressableKeys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "u", "Escape"]
+        let pressableKeys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "KeyU", "Escape"]
 
         let pressedKeys = []
 
@@ -69,7 +68,7 @@ class Game {
                         playerMovementVector.y = playerMovementVector.y + movements[pressedKey].y
                     })
 
-                    this.currentScreen.player.setIsFiring(pressedKeys.includes("u"))
+                    this.currentScreen.player.setIsFiring(pressedKeys.includes("KeyU"))
 
 
 
@@ -101,17 +100,19 @@ class Game {
 
         window.addEventListener("keydown", function (e){
 
-            if ((pressableKeys.includes(e.key)) && !(pressedKeys.includes(e.key))){
-                pressedKeys.push(e.key)
+            if ((pressableKeys.includes(e.code)) && !(pressedKeys.includes(e.code))){
+                e.preventDefault()
+                pressedKeys.push(e.code)
             }
 
 
         },false)
 
         window.addEventListener("keyup", function (e){
-            if ((pressableKeys.includes(e.key)) && (pressedKeys.includes(e.key))){
+            e.preventDefault()
+            if ((pressableKeys.includes(e.code)) && (pressedKeys.includes(e.code))){
 
-                const index = pressedKeys.indexOf(e.key)
+                const index = pressedKeys.indexOf(e.code)
 
                 pressedKeys.splice(index, 1)
 

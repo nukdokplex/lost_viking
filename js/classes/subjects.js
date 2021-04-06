@@ -2,6 +2,31 @@ import {GameObject} from "./gameobject.js";
 import {Collision} from "./collision.js";
 import {Vector2, Vector3} from "./vector.js";
 
+function hslToRgb(h, s, l){
+    var r, g, b;
+
+    if(s === 0){
+        r = g = b = l; // achromatic
+    }else{
+        let hue2rgb = function hue2rgb(p, q, t){
+            if(t < 0) t += 1;
+            if(t > 1) t -= 1;
+            if(t < 1/6) return p + (q - p) * 6 * t;
+            if(t < 1/2) return q;
+            if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            return p;
+        }
+
+        let q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        let p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+    }
+
+    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+}
+
 class Subject extends GameObject {
     defaultSpeed
     movementVector
@@ -108,7 +133,6 @@ class Gun extends GameObject {
     cooldownTime
     ellapsedTime
     owner
-
     constructor(owner, bulletVector, bulletSpeed, bulletDamage, gunPosition, cooldownTime, level) {
         super(0)
         this.ellapsedTime = 0
@@ -160,7 +184,6 @@ class Enemy extends Subject {
     }
 
     render() {
-
         this.level.game.gl.fillStyle = this.fill;
         this.level.game.gl.beginPath()
         this.level.game.gl.moveTo(this.position.x-36, this.position.y - 31)
@@ -177,12 +200,15 @@ class Enemy extends Subject {
         for (let i = 0; i < this.level.bullets.length; i++){
             if (this.collision.collide(this.level.bullets[i])){
                 this.health -= this.level.bullets[i].damage
+                this.level.pp += 5
                 this.level.bullets.splice(i, 1)
             }
         }
 
         if (this.health <= 0){
+            this.level.pp += 10
             this.destroy(Enemy)
+
         }
 
         if (this.collision.collideCanvasSpecificBorders(false, false, false, true)){
@@ -203,6 +229,7 @@ class Enemy extends Subject {
 
 class Player extends Subject {
     gun
+    maxHealth = 150
     constructor(defaultSpeed, level, collisionRadius, health) {
         super(defaultSpeed, collisionRadius, level);
         this.gun = new Gun(this, new Vector3(0, -1, 1), 7, 50, new Vector2(0, -32), 100)
@@ -210,8 +237,8 @@ class Player extends Subject {
     }
 
     render() {
-
-        this.level.game.gl.fillStyle = "rgba( 0, 200, 100, 1 )";
+        let color = hslToRgb(this.health / this.maxHealth / 3, 1, 0.5)
+        this.level.game.gl.fillStyle = "rgba( "+color[0]+", "+color[1]+", "+color[2]+", 1 )";
         this.level.game.gl.beginPath()
         this.level.game.gl.moveTo(this.position.x-36, this.position.y + 31)
         this.level.game.gl.lineTo(this.position.x+36, this.position.y + 31)
@@ -221,7 +248,7 @@ class Player extends Subject {
             this.level.game.gl.fill()
         }
         catch (e) {
-            
+
         }
         super.render()
     }

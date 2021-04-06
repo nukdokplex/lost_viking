@@ -54,4 +54,31 @@ class Button extends GameObject{
     }
 }
 
-export {Button}
+class Label extends GameObject{
+    text
+    fill
+    fillText
+    font
+
+    constructor(position, screen) {
+        super(position, screen);
+    }
+
+    render() {
+        super.render();
+        this.screen.game.gl.fillStyle = this.fillText
+        this.screen.game.gl.textAlign = "start"
+
+        this.screen.game.gl.font = this.font
+
+        this.screen.game.gl.fillText(
+            this.text,
+            (this.position.x),
+            (this.position.y),
+        )
+    }
+
+
+}
+
+export {Button, Label}

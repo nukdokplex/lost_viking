@@ -1,6 +1,6 @@
 import {Player, Enemy, Bullet, Gun} from "./subjects.js";
 import {Vector2, Vector3} from "./vector.js";
-import {Button} from "./uielements.js";
+import {Button, Label} from "./uielements.js";
 
 class Screen {
     game
@@ -55,13 +55,16 @@ class Level extends Screen{
         super(game)
         this.bullets = []
         this.enemies = []
+        this.pp = 0
+        this.ppCounter = new Label(new Vector2(10, 690), this)
+        this.ppCounter.fillText = "rgba(255,255,255,1)"
+        this.ppCounter.font = "16px sans-serif"
         this.ready = false
         this.audioReady = false
-        console.log(this.ellapsedTime)
         this.ellapsedTime = 0
-        console.log(this.ellapsedTime)
-        this.player = new Player(5, this, 20, 100);
+        this.player = new Player(5, this, 20, 150);
         this.player.position = new Vector2(this.game.canvas.width / 2, this.game.canvas.height - 150)
+
         this.enemiesToSpawn = enemiesToSpawn
         this.originalEnemiesToSpawn = enemiesToSpawn
         this.musicFile = musicFile
@@ -99,7 +102,8 @@ class Level extends Screen{
         this.enemies.forEach(enemy => {
             enemy.render()
         })
-
+        this.ppCounter.text = "PP: " + this.pp
+        this.ppCounter.render()
 
     }
 
@@ -162,31 +166,21 @@ class Menu extends Screen{
         this.level = level
         this.level.game = this.game
         this.level.musicPlayer.volume = 0.05
-        this.splashImage = new Image(splashImagePath)
+        this.splashImage = new Image()
+        this.splashImage.src = splashImagePath
         this.splashImagePosition = new Vector2(40,40)
         this.buttons.push(new Button(new Vector2(40, 250), this, new Vector2(320, 60)))
         this.buttons[0].fill = "rgb(255,255,255)"
         this.buttons[0].fillText = "rgb(0,0,0)"
-        this.buttons[0].font = "48px sans-serif"
+        this.buttons[0].font = "30px 'Press Start 2P', cursive"
         this.buttons[0].label = "< Main Menu"
         this.buttons[0].setOnClickListener(() => {
-            this.level.musicPlayer.pause()
-            this.level.musicPlayer.currentTime = 0
-            this.game.navigate(new MainMenu(this.game))
 
+
+            window.location.reload(false)
         })
 
-        this.buttons.push(new Button(new Vector2(40, 320), this, new Vector2(320, 60)))
-        this.buttons[1].fill = "rgb(255,255,255)"
-        this.buttons[1].fillText = "rgb(0,0,0)"
-        this.buttons[1].font = "48px sans-serif"
-        this.buttons[1].label = "Retry"
-        this.buttons[1].setOnClickListener(() => {
-            this.level.musicPlayer.pause()
-            this.level.musicPlayer.currentTime = 0
-            this.game.navigate(new Level(this.game, this.level.originalEnemiesToSpawn, this.level.musicFile, this.level.backgroundImage))
 
-        })
     }
 
     render() {
@@ -218,9 +212,9 @@ class MainMenu extends Screen{
 
         this.level1Button = new Button(new Vector2(40, 230), this, new Vector2(320, 60))
 
-        this.level1Button.fill = "rgb(50, 255, 100)"
+        this.level1Button.fill = "rgb(255, 50, 50)"
         this.level1Button.fillText = "white"
-        this.level1Button.font = "48px sans-serif"
+        this.level1Button.font = "30px 'Press Start 2P', cursive"
         this.level1Button.setOnClickListener(() => {
             $.ajax({
                 type: 'GET',
@@ -241,7 +235,59 @@ class MainMenu extends Screen{
         })
         this.level1Button.label = "Level 1"
 
+        this.level2Button = new Button(new Vector2(40, 300), this, new Vector2(320, 60))
+
+        this.level2Button.fill = "rgb(255, 50, 255)"
+        this.level2Button.fillText = "white"
+        this.level2Button.font = "30px 'Press Start 2P', cursive"
+        this.level2Button.setOnClickListener(() => {
+            $.ajax({
+                type: 'GET',
+                url: "/data/level_2.json",
+                async: false,
+                contentType: "application/json",
+                dataType: "json",
+                success: (data) => {
+                    this.game.navigate(new Level(this.game, data.enemies, data.musicFile, data.backgroundImage))
+                },
+                error: function (e) {
+                    alert("Не удалось загрузить данные уровня... Действие невозможно!")
+                }
+
+
+            })
+
+        })
+        this.level2Button.label = "Level 2"
+
+        this.level3Button = new Button(new Vector2(40, 370), this, new Vector2(320, 60))
+
+        this.level3Button.fill = "rgba(40,53,147 ,1)"
+        this.level3Button.fillText = "white"
+        this.level3Button.font = "30px 'Press Start 2P', cursive"
+        this.level3Button.setOnClickListener(() => {
+            $.ajax({
+                type: 'GET',
+                url: "/data/level_3.json",
+                async: false,
+                contentType: "application/json",
+                dataType: "json",
+                success: (data) => {
+                    this.game.navigate(new Level(this.game, data.enemies, data.musicFile, data.backgroundImage))
+                },
+                error: function (e) {
+                    alert("Не удалось загрузить данные уровня... Действие невозможно!")
+                }
+
+
+            })
+
+        })
+        this.level3Button.label = "Level 3"
+
         this.buttons.push(this.level1Button)
+        this.buttons.push(this.level2Button)
+        this.buttons.push(this.level3Button)
     }
 
     render(){

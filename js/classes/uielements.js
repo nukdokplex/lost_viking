@@ -6,46 +6,51 @@ class Button extends GameObject{
     fillText
     font
     size
-    padding
     listener
-    constructor(position) {
-        super(position);
+    constructor(position, screen, size) {
+        super(position, screen);
+        this.size = size
 
     }
 
     render(){
-        gl.fillStyle = this.fill
-        gl.textAlign = "center"
-        gl.fillRect(
+        this.screen.game.gl.fillStyle = this.fill
+        this.screen.game.gl.textAlign = "center"
+        this.screen.game.gl.fillRect(
             this.position.x,
             this.position.y,
             this.size.x,
             this.size.y
         )
-        gl.fillStyle = this.fillText
-        gl.font = this.font
-
-        gl.fillText(
+        this.screen.game.gl.fillStyle = this.fillText
+        this.screen.game.gl.font = this.font
+        this.screen.game.gl.textBaseline = "middle"
+        this.screen.game.gl.fillText(
             this.label,
-            this.position.x+this.padding.x,
-            this.position.y+this.padding.y,
+            (this.position.x+this.size.x/2),
+            (this.position.y+this.size.y/2),
             this.size.x
         )
     }
 
     canvasClick(event){
-        let x = event.pageX - canvas.offsetLeft - canvas.clientLeft
-        let y = event.pageY - canvas.offsetTop - canvas.clientTop
 
-        if (this.position.x <= x <= this.position.x+this.size.x &&
-            this.position.y <= y <= this.position.y+this.size.y){
+        let x = event.pageX - this.screen.game.canvas.offsetLeft - this.screen.game.canvas.clientLeft
+        let y = event.pageY - this.screen.game.canvas.offsetTop - this.screen.game.canvas.clientTop
+
+        if (this.position.x <= x &&
+            x <= this.position.x+this.size.x &&
+            this.position.y <= y &&
+            y <= this.position.y+this.size.y){
             this.listener()
         }
     }
 
     setOnClickListener(listener){
         this.listener = listener
-        gl.addEventListener('click', this.canvasClick(event), false)
+        this.screen.game.canvas.addEventListener('click', event => {
+            this.canvasClick(event)
+        }, false)
     }
 }
 

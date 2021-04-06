@@ -4,24 +4,32 @@ import {Vector2, Vector3} from "./vector.js";
 class Game {
     gl
     canvas
-    currentLevel
+    currentScreen
     musicPlayer
+
 
     constructor(gl, canvas) {
         this.gl = gl
         this.canvas = canvas
     }
 
-    navigate(level){
-        this.currentLevel = level
+    navigate(screen){
+        if (this.currentScreen !== undefined)
+            this.currentScreen.destroy()
+        this.currentScreen = screen
+    }
+
+    navigateWithoutDestruction(screen){
+
+        this.currentScreen = screen
     }
 
     render (){
-        this.currentLevel.render()
+        this.currentScreen.render()
     }
 
     move(){
-        this.currentLevel.move();
+        this.currentScreen.move();
     }
 
     initialize(){
@@ -30,88 +38,65 @@ class Game {
             "ArrowRight": {"x": 1, "y": 0},
             "ArrowUp": {"x": 0, "y": -1},
             "ArrowDown": {"x": 0, "y": 1},
-            "u": {"x": 0, "y": 0}
-        }
-        let level1 = {
-            'enemies' : {
-                2000: [
-                    {
-                        'movementVector': {
-                            'x': 0,
-                            'y': 1
-                        },
-                        'spawnX': 100,
-                        'speed': 2,
-                        'hp': 100,
-                        'cooldown': 400,
-                        'damage': 50,
-                        'bulletDamage': 25,
-                        'bulletSpeed': 5,
-                        'fill': "rgba(200, 60, 50, 1)"
-                    },
-                    {
-                        'movementVector': {
-                            'x': 0,
-                            'y': 1
-                        },
-                        'spawnX': 200,
-                        'speed': 2,
-                        'hp': 100,
-                        'cooldown': 400,
-                        'damage': 50,
-                        'bulletDamage': 25,
-                        'bulletSpeed': 5,
-                        'fill': "rgba(200, 60, 50, 1)"
-                    },
-                    {
-                        'movementVector': {
-                            'x': 0,
-                            'y': 1
-                        },
-                        'spawnX': 300,
-                        'speed': 2,
-                        'hp': 100,
-                        'cooldown': 400,
-                        'damage': 50,
-                        'bulletDamage': 25,
-                        'bulletSpeed': 5,
-                        'fill': "rgba(200, 60, 50, 1)"
-                    },
-                ],
-
-
-            },
-            'musicFile': "/sound/redefined.mp3",
-            'backgroundImage': "/img/level_1_bg.jpg"
+            "u": {"x": 0, "y": 0},
+            "Escape": {"x": 0, "y": 0}
         }
 
-        this.navigate(new Level(this, level1.enemies, level1.musicFile, level1.backgroundImage))
-        let pressableKeys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "u"]
+
+
+
+        let mainMenu = new MainMenu(this)
+        mainMenu.setBackground('/img/main-menu.png')
+
+
+        this.navigate(mainMenu)
+        let pressableKeys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "u", "Escape"]
 
         let pressedKeys = []
 
 
         setInterval(() => {
-            this.clearCanvas()
-            if (!this.currentLevel.isPrototypeOf(MainMenu)){
-                let playerMovementVector = new Vector3(0,0,1)
+            if (this.currentScreen instanceof Level) {
 
-                playerMovementVector.x = 0
-                playerMovementVector.y = 0
-                pressedKeys.forEach(function (pressedKey){
-                    playerMovementVector.x = playerMovementVector.x + movements[pressedKey].x
-                    playerMovementVector.y = playerMovementVector.y + movements[pressedKey].y
-                })
+                if (this.currentScreen.ready) {
+                    this.clearCanvas()
+                    let playerMovementVector = new Vector3(0, 0, 1)
 
-                this.currentLevel.player.setIsFiring(pressedKeys.includes("u"))
+                    playerMovementVector.x = 0
+                    playerMovementVector.y = 0
+                    pressedKeys.forEach(function (pressedKey) {
+                        playerMovementVector.x = playerMovementVector.x + movements[pressedKey].x
+                        playerMovementVector.y = playerMovementVector.y + movements[pressedKey].y
+                    })
 
-                this.currentLevel.player.setMovement(playerMovementVector)
+                    this.currentScreen.player.setIsFiring(pressedKeys.includes("u"))
+
+
+
+                    this.currentScreen.player.setMovement(playerMovementVector)
+
+                    if (pressedKeys.includes("Escape")){
+                        this.currentScreen.gameOver()
+                    }
+                    this.render()
+                }
+
             }
-            this.render()
+            else{
+                this.clearCanvas()
+                this.render()
+            }
         }, renderInterval)
 
         setInterval(() => {
-            this.move()
+            if (this.currentScreen instanceof Level) {
+                if (this.currentScreen.ready) {
+                    this.move()
+                }
+            }
+            else{
+                this.move()
+            }
         }, moveInterval);
 
         window.addEventListener("keydown", function (e){

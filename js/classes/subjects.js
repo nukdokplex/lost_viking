@@ -10,7 +10,7 @@ class Subject extends GameObject {
     collision
     level
     constructor(defaultSpeed, collisionRadius, level, position) {
-        super(position);
+        super(position, level);
         this.defaultSpeed = defaultSpeed
         this.collision = new Collision(collisionRadius, this)
         this.level = level
@@ -92,8 +92,12 @@ class Bullet extends Subject {
         super.move()
 
 
-        if (this.collision.collideCanvasBorders()){
+        if (this.collision.collideCanvasSpecificBorders(false, true, false, true)){
             this.destroy(Bullet)
+        }
+
+        if (this.collision.collideCanvasSpecificBorders(true, false, true)){
+            this.movementVector.x = -this.movementVector.x
         }
 
     }
@@ -143,14 +147,13 @@ class Enemy extends Subject {
 
     health
     gun
-    constructor(level, defaultSpeed, collisionRadius, movementVector, x, health, cooldown, damage, bulletDamage, bulletSpeed, fill) {
-        super(defaultSpeed, collisionRadius, level);
+    constructor(level, defaultSpeed, collisionRadius, movementVector, position, health, cooldown, damage, bulletDamage, bulletSpeed, fill) {
+        super(defaultSpeed, collisionRadius, level, position);
 
         this.movementVector = movementVector
-        this.position = new Vector2(x, 0)
         this.health = health
-        this.gun = new Gun(this, new Vector3(0, 1, 1), bulletSpeed, bulletDamage, new Vector2(0, 32), cooldown)
-        this.gun.isFiring = true
+        this.gun = new Gun(this, new Vector3(this.movementVector.x, 1, 1), bulletSpeed, bulletDamage, new Vector2(0, 32), cooldown)
+        this.gun.isFiring = cooldown > 0
 
         this.damage = damage
         this.fill = fill
@@ -186,6 +189,10 @@ class Enemy extends Subject {
             this.destroy(Enemy)
         }
 
+        if (this.collision.collideCanvasSpecificBorders(true, false, true)){
+            this.movementVector.x = -this.movementVector.x
+        }
+
         let bullets = this.gun.fire()
 
         if (bullets != null){
@@ -210,7 +217,12 @@ class Player extends Subject {
         this.level.game.gl.lineTo(this.position.x+36, this.position.y + 31)
         this.level.game.gl.lineTo(this.position.x, this.position.y - 31)
         this.level.game.gl.closePath()
-        this.level.game.gl.fill()
+        try {
+            this.level.game.gl.fill()
+        }
+        catch (e) {
+            
+        }
         super.render()
     }
 
@@ -233,6 +245,10 @@ class Player extends Subject {
                 this.health -= this.level.bullets[i].damage
                 this.level.bullets[i].destroy(Bullet)
             }
+        }
+
+        if (this.health <= 0){
+            this.level.gameOver()
         }
 
         let bullets = this.gun.fire()

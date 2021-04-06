@@ -1,7 +1,9 @@
 class GameObject{
     position
-    constructor(position) {
+    screen
+    constructor(position, screen) {
         this.position = position
+        this.screen = screen
     }
 
 

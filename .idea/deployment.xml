@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" serverName="lostviking.nukdotcom.ru" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
-      <paths name="nukdotcom.ru">
+      <paths name="lostviking.nukdotcom.ru">
         <serverdata>
           <mappings>
             <mapping deploy="/" local="$PROJECT_DIR$" web="/" />

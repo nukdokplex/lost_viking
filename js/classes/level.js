@@ -1,6 +1,6 @@
 import {Player, Enemy, Bullet, Gun} from "./subjects.js";
 import {Vector2, Vector3} from "./vector.js";
-import {Button, Label} from "./uielements.js";
+import {Button, Label, ProgressBar} from "./uielements.js";
 
 class Screen {
     game
@@ -40,6 +40,7 @@ class Level extends Screen{
     player
     enemies
     enemiesToSpawn
+    enemiesTotalCount
     originalEnemiesToSpawn
     musicFile
     backgroundImage
@@ -50,6 +51,7 @@ class Level extends Screen{
     audioReady
     bullets
     ellapsedTime
+    progressBar
 
     constructor(game, enemiesToSpawn, musicFile, backgroundImage) {
         super(game)
@@ -58,14 +60,17 @@ class Level extends Screen{
         this.pp = 0
         this.ppCounter = new Label(new Vector2(10, 690), this)
         this.ppCounter.fillText = "rgba(255,255,255,1)"
-        this.ppCounter.font = "16px sans-serif"
+        this.ppCounter.font = "16px 'Press Start 2P', cursive"
         this.ready = false
         this.audioReady = false
         this.ellapsedTime = 0
-        this.player = new Player(5, this, 20, 150);
+        this.player = new Player(5, this, 20, 500);
         this.player.position = new Vector2(this.game.canvas.width / 2, this.game.canvas.height - 150)
 
+        this.progressBar = new ProgressBar(new Vector2(0,0), this, new Vector2(400, 11), 0, "rgba(255,255,255,1)")
+
         this.enemiesToSpawn = enemiesToSpawn
+        this.enemiesTotalCount = this.enemiesToSpawn.length
         this.originalEnemiesToSpawn = enemiesToSpawn
         this.musicFile = musicFile
         this.backgroundImage = backgroundImage
@@ -102,8 +107,9 @@ class Level extends Screen{
         this.enemies.forEach(enemy => {
             enemy.render()
         })
-        this.ppCounter.text = "PP: " + this.pp
+        this.progressBar.render()
         this.ppCounter.render()
+
 
     }
 
@@ -119,7 +125,10 @@ class Level extends Screen{
         while(true) {
 
             if (this.enemiesToSpawn.length === 0){
-                this.cleared()
+                if (this.enemies.length === 0){
+                    this.cleared()
+                }
+
                 break;
             }
 
@@ -132,7 +141,7 @@ class Level extends Screen{
             let enemyToSpawn = new Enemy(
                 this,
                 e.speed,
-                20,
+                35,
                 new Vector3(e.movementVector.x, e.movementVector.y),
                 new Vector2(e.spawnX, 0),
                 e.hp,
@@ -152,6 +161,8 @@ class Level extends Screen{
         this.player.move()
         this.bullets.forEach(bullet => bullet.move())
         this.enemies.forEach(enemy => enemy.move())
+        this.ppCounter.text = "PP: " + this.pp
+        this.progressBar.progress = this.enemiesToSpawn.length / this.enemiesTotalCount * 100
         this.spawn()
     }
 }
@@ -288,6 +299,14 @@ class MainMenu extends Screen{
         this.buttons.push(this.level1Button)
         this.buttons.push(this.level2Button)
         this.buttons.push(this.level3Button)
+    }
+
+    destroy() {
+        this.buttons.forEach((button) => {
+            button.destroy()
+        })
+        super.destroy();
+
     }
 
     render(){

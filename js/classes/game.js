@@ -39,6 +39,7 @@ class Game {
             "ArrowUp": {"x": 0, "y": -1},
             "ArrowDown": {"x": 0, "y": 1},
             "Space": {"x": 0, "y": 0},
+            "Escape": {"x": 0, "y": 0}
         }
 
 

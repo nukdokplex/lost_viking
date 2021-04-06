@@ -6,7 +6,7 @@ function hslToRgb(h, s, l){
     var r, g, b;
 
     if(s === 0){
-        r = g = b = l; // achromatic
+        r = g = b = l;
     }else{
         let hue2rgb = function hue2rgb(p, q, t){
             if(t < 0) t += 1;
@@ -106,10 +106,13 @@ class Bullet extends Subject {
 
     render(){
         this.level.game.gl.fillStyle = "rgba(0, 125, 200, 1 )";
+        this.level.game.gl.strokeStyle = "rgba(255,0,0,1)"
         this.level.game.gl.beginPath()
         this.level.game.gl.arc(this.position.x, this.position.y, this.collision.radius, 0, 2 * Math.PI)
         this.level.game.gl.closePath()
         this.level.game.gl.fill()
+        this.level.game.gl.stroke()
+
         super.render()
     }
 
@@ -176,7 +179,7 @@ class Enemy extends Subject {
 
         this.movementVector = movementVector
         this.health = health
-        this.gun = new Gun(this, new Vector3(this.movementVector.x, 1, 1), bulletSpeed, bulletDamage, new Vector2(0, 32), cooldown)
+        this.gun = new Gun(this, new Vector3(this.movementVector.x, 1, 1), bulletSpeed, bulletDamage, new Vector2(0, 36), cooldown)
         this.gun.isFiring = cooldown > 0
 
         this.damage = damage
@@ -229,7 +232,7 @@ class Enemy extends Subject {
 
 class Player extends Subject {
     gun
-    maxHealth = 150
+    maxHealth = 500
     constructor(defaultSpeed, level, collisionRadius, health) {
         super(defaultSpeed, collisionRadius, level);
         this.gun = new Gun(this, new Vector3(0, -1, 1), 7, 50, new Vector2(0, -32), 100)

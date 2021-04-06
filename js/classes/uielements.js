@@ -7,6 +7,7 @@ class Button extends GameObject{
     font
     size
     listener
+    originalListener
     constructor(position, screen, size) {
         super(position, screen);
         this.size = size
@@ -33,6 +34,12 @@ class Button extends GameObject{
         )
     }
 
+    destroy(){
+        if (this.listener !== null){
+            this.screen.game.canvas.removeEventListener('click', this.originalListener)
+        }
+    }
+
     canvasClick(event){
 
         let x = event.pageX - this.screen.game.canvas.offsetLeft - this.screen.game.canvas.clientLeft
@@ -48,9 +55,11 @@ class Button extends GameObject{
 
     setOnClickListener(listener){
         this.listener = listener
-        this.screen.game.canvas.addEventListener('click', event => {
-            this.canvasClick(event)
-        }, false)
+        let button = this
+        this.originalListener = function (event) {
+            button.canvasClick(event)
+        }
+        this.screen.game.canvas.addEventListener('click', this.originalListener, false)
     }
 }
 
@@ -81,4 +90,26 @@ class Label extends GameObject{
 
 }
 
-export {Button, Label}
+class ProgressBar extends GameObject{
+    size
+    progress
+    fill
+    constructor(position, screen, size, progress, fill) {
+        super(position, screen);
+        this.size = size
+        this.progress = progress
+        this.fill = fill
+    }
+
+    render() {
+        super.render();
+        this.screen.game.gl.fillStyle = this.fill
+        this.screen.game.gl.fillRect(this.position.x, this.position.y, this.size.x/100*this.progress, this.size.y)
+    }
+
+    move(){
+
+    }
+}
+
+export {Button, Label, ProgressBar}

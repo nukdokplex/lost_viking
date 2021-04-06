@@ -38,7 +38,7 @@ class Game {
             "ArrowRight": {"x": 1, "y": 0},
             "ArrowUp": {"x": 0, "y": -1},
             "ArrowDown": {"x": 0, "y": 1},
-            "KeyU": {"x": 0, "y": 0},
+            "Space": {"x": 0, "y": 0},
         }
 
 
@@ -49,7 +49,7 @@ class Game {
 
 
         this.navigate(mainMenu)
-        let pressableKeys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "KeyU", "Escape"]
+        let pressableKeys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Space", "Escape"]
 
         let pressedKeys = []
 
@@ -68,7 +68,7 @@ class Game {
                         playerMovementVector.y = playerMovementVector.y + movements[pressedKey].y
                     })
 
-                    this.currentScreen.player.setIsFiring(pressedKeys.includes("KeyU"))
+                    this.currentScreen.player.setIsFiring(pressedKeys.includes("Space"))
 
 
 
